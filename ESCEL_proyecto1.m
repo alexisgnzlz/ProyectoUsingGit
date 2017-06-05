@@ -81,7 +81,7 @@ disp(0.1*round(10*CIV(round(.01*length(CIV)))))
 % un color distinto para cada grupo de frecuencias
 K=input('Grafica de celdas dominantes en cada punto? (S/N)','s');
 
-if K=='S' %| K=='s'
+if K=='S' || K=='s'
 disp('Graficando...');
 newplot; plot(260,290,'k.'); hold on
 
@@ -95,7 +95,7 @@ for x=1:260
         plot(x,y, punto)
     end
 end
-for b=1:20; plot(real(BTS(b)), imag(BTS(b)),'kx'); end
+%for b=1:20; plot(real(BTS(b)), imag(BTS(b)),'kx'); end
 hold off
 else
 end
@@ -111,7 +111,7 @@ disp(round(1000*kk/length(CIV))/10)
 % Grafica de puntos fuera de cobertura
 R=input('Grafica de puntos fuera de cobertura? (S/N)','s');
 
-if R=='S' %| R=='s'
+if R=='S' || R=='s'
     disp('Graficando...');
     hold on;
         if K ~= 's' & K ~= 'S'; hold off; newplot; plot(260,290,'k.'); hold on; end 
