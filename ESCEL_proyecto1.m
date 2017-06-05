@@ -87,15 +87,15 @@ newplot; plot(260,290,'k.'); hold on
 
 for x=1:260
     for y=1:290
-        if MASK(1,Celda(x,y))==1; COLOR='blue'; end
-        if MASK(2,Celda(x,y))==1; COLOR='red'; end
-        if MASK(3,Celda(x,y))==1; COLOR='green'; end
-        if MASK(4,Celda(x,y))==1; COLOR='yellow'; end
+        if MASK(1,Celda(x,y))==1; COLOR='b'; end
+        if MASK(2,Celda(x,y))==1; COLOR='r'; end
+        if MASK(3,Celda(x,y))==1; COLOR='g'; end
+        if MASK(4,Celda(x,y))==1; COLOR='y'; end
         punto=strcat(COLOR,'.');
         plot(x,y, punto)
     end
 end
-%for b=1:20; plot(real(BTS(b)), imag(BTS(b)),'kx'); end
+for b=1:20; plot(real(BTS(b)), imag(BTS(b)),'kx'); end
 hold off
 else
 end
