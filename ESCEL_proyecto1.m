@@ -15,7 +15,7 @@
 
 clear; j=sqrt(-1); pi=3.141592654; format compact;
 
-Pref=-20; dref=10; n=5;
+Pref=-20; dref=10; n=4;
 % Pref, dref, n son los parametros del modelo exponencial para las perdidas
 % de trayecto (Pref va en dBm, dref va en metros)
 
@@ -37,6 +37,8 @@ load DATA_ESCELL_2; % Aqu� se carga el archivo previamente generado que contie
 % Los valores de SHAD son enteros y estan escalados por un factor de 80
 % Los valores de SHAD poseen correlacion espacial y angular
 
+%save BTS.dat BTS() -ascii
+
 MASK(1,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
 MASK(2,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
 MASK(3,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
@@ -50,6 +52,7 @@ for x=1:260
     for y=1:290
         pos=x+j*y; % pos es la posicion (compleja) del punto (x,y) 
         for b=1:20
+            disp(BTS(b));
             d=50*abs(pos-BTS(b)); % distancia en metros del punto x,y a la celda b-esima
             Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
         end
@@ -60,6 +63,9 @@ for x=1:260
         CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
     end
 end
+
+% Así se guardn los datos en formato ascii de una variable
+%save Celda.dat Celda -ascii
 
 % obtencion del vector CIV (valores de C/I(dB) de los puntos de la rejilla ordenados)
 for x=1:260; for y=1:290; CIV((x-1)*290+y)=CI(x,y); end; end
