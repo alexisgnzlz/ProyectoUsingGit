@@ -15,7 +15,8 @@
 
 clear; j=sqrt(-1); pi=3.141592654; format compact;
 
-Pref=-20; dref=10; n=5;
+%Pref=-20; dref=10; n=5;
+Pref = 10*log10(25000);
 % Pref, dref, n son los parametros del modelo exponencial para las perdidas
 % de trayecto (Pref va en dBm, dref va en metros)
 
@@ -45,13 +46,26 @@ MASK(4,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
 % MASK(g,b)=1 si la BTS b-esima pertenece al grupo de frecuencias g-esimo
 
 
+% En la pregunta 2 partes a y b se usará el modelo de uso rápido => hre = 1.5m, hte = 32m, fc = 850MHz o 1900MHz
+% La potencia promedio será: <Pr> = EIRP - L + Xsigma
+
 % El siguiente lazo multiple calcula el C/I en cada punto de la rejilla
 for x=1:260
     for y=1:290
         pos=x+j*y; % pos es la posicion (compleja) del punto (x,y) 
         for b=1:20
-            d=50*abs(pos-BTS(b)); % distancia en metros del punto x,y a la celda b-esima
-            Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
+            d=(50*abs(pos-BTS(b)))/1000; % distancia en metros del punto x,y a la celda b-esima
+            %Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
+            %Parte a modelo Hara de uso rápido
+            Pr(b) = Pref - (125 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
+            %Parte b modelo COST 231
+            %Pr(b) = Pref - (140 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
+            %Parte c celdas 7 y 17 con altura 48 metros
+            %if (b == 7 || b == 17)
+            %    Pr(b) = Pref - (122.95 + 33.89*log10(d)) + sigma*SHAD(x,y,b)/100;
+            %else
+            %    Pr(b) = Pref - (125 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
+            %end
         end
         [C,I]=max(Pr); % determinar la celda dominante en el punto x,y
         C=10^(C/10); Celda(x,y)=I;
