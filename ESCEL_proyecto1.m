@@ -57,8 +57,8 @@ for x=1:260
             d=(50*abs(pos-BTS(b)))/1000; % distancia en metros del punto x,y a la celda b-esima
             %Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
             %Parte a modelo Hara de uso rápido
-            %Pr(b) = Pref - (125 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
-            Parte b modelo COST 231
+            Pr(b) = Pref - (125 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
+            %Parte b modelo COST 231
             %Pr(b) = Pref - (140 + 35*log10(d)) + sigma*SHAD(x,y,b)/100;
             %Parte c celdas 7 y 17 con altura 48 metros
             %if (b == 7 || b == 17)
