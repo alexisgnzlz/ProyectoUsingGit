@@ -21,7 +21,7 @@ Pref=-20; dref=10; n=4;
 
 sigma=8; %sigma es la desviacion estandar (dB) deseada para el ensombrecimiento
 
-Pr=zeros(1,20);  CI=zeros(260,290); Celda=zeros(260,290,'int8'); 
+Pr=zeros(3,20);  CI=zeros(260,290); Celda=zeros(260,290,'int8'); 
 % Pr(b) es la p�tencia recibida en dBm desde la celda b-esima (se calcula para cada
 % punto de la rejilla)
 % Celda (x,y) es el �ndice de la celda dominante en el punto de coordenadas x,y
@@ -43,6 +43,14 @@ MASK(1,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
 MASK(2,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
 MASK(3,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
 MASK(4,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(5,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
+MASK(6,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
+MASK(7,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
+MASK(8,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(9,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
+MASK(10,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
+MASK(11,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
+MASK(12,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
 % MASK es la mascara que asocia a cada BTS a uno de 4 grupos de frecuencias
 % MASK(g,b)=1 si la BTS b-esima pertenece al grupo de frecuencias g-esimo
 
@@ -52,7 +60,6 @@ for x=1:260
     for y=1:290
         pos=x+j*y; % pos es la posicion (compleja) del punto (x,y) 
         for b=1:20
-            disp(BTS(b));
             d=50*abs(pos-BTS(b)); % distancia en metros del punto x,y a la celda b-esima
             Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
         end
