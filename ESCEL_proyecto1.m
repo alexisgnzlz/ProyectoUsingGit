@@ -68,21 +68,10 @@ for x=1:260
             Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
         end
         [C,I]=max(Pr); % determinar la celda dominante en el punto x,y
-        C=10^(C/10); Celda(x,y,Sector(I))=I; FCelda = 0;
-        for h=1:12 
-            FCelda=FCelda+h*MASK(h,I);
-        end
-        Int = 0;
-        for h=1:20
-            if (Sector(I) == Sector(h) && h != I)
-                Int = Int + 10^(Pr(h)/10);
-            end
-        end
-        disp(Int);
-        if (Int != 0)
-            CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
-        else CI(x,y)=10*log10(C);
-        end
+        C=10^(C/10); Celda(x,y,Sector(I))=I;
+        FCelda = 1*MASK(1,I)+4*MASK(4,I)+7*MASK(7,I)+10*MASK(10,I)+Sector(I)-1;
+        Int=sum(10.^(Pr/10).*MASK(FCelda,:))-C;
+        CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
     end
 end
 
