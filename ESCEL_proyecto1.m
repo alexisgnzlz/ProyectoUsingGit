@@ -21,7 +21,7 @@ Pref=-20; dref=10; n=4;
 
 sigma=8; %sigma es la desviacion estandar (dB) deseada para el ensombrecimiento
 
-Pr=zeros(3,20);  CI=zeros(260,290); Celda=zeros(260,290,'int8'); 
+Pr=zeros(1,20);  CI=zeros(260,290); Celda=zeros(260,290,3,'int8'); Sector=zeros(1,20,'int8');
 % Pr(b) es la p�tencia recibida en dBm desde la celda b-esima (se calcula para cada
 % punto de la rejilla)
 % Celda (x,y) es el �ndice de la celda dominante en el punto de coordenadas x,y
@@ -39,18 +39,18 @@ load DATA_ESCELL_2; % Aqu� se carga el archivo previamente generado que contie
 
 %save BTS.dat BTS() -ascii
 
-MASK(1,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
-MASK(2,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
-MASK(3,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
-MASK(4,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
-MASK(5,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
+MASK(1,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(2,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(3,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(4,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
+MASK(5,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
 MASK(6,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
-MASK(7,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
-MASK(8,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(7,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
+MASK(8,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
 MASK(9,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
-MASK(10,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
+MASK(10,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
 MASK(11,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
-MASK(12,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+MASK(12,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
 % MASK es la mascara que asocia a cada BTS a uno de 4 grupos de frecuencias
 % MASK(g,b)=1 si la BTS b-esima pertenece al grupo de frecuencias g-esimo
 
@@ -61,13 +61,28 @@ for x=1:260
         pos=x+j*y; % pos es la posicion (compleja) del punto (x,y) 
         for b=1:20
             d=50*abs(pos-BTS(b)); % distancia en metros del punto x,y a la celda b-esima
+            angulo = angle(pos-BTS(b));
+            if (angulo >= 0 && angulo < (2*pi)/3) Sector(b) = 1; end
+            if ((angulo >= (2*pi)/3 && angulo <= pi) || (angulo >= -pi && angulo < -(2*pi)/3)) Sector(b) = 2; end
+            if (angulo < 0 && angulo >= -(2*pi)/3) Sector(b) = 3; end
             Pr(b)=Pref-10*n*log10(d/dref)+sigma*SHAD(x,y,b)/100; % modelo exponencial
         end
         [C,I]=max(Pr); % determinar la celda dominante en el punto x,y
-        C=10^(C/10); Celda(x,y)=I;
-        FCelda=1*MASK(1,I)+2*MASK(2,I)+3*MASK(3,I)+4*MASK(4,I); % determinar a que grupo de frec pertenece la celda dominante
-        Int=sum(10.^(Pr/10).*MASK(FCelda,:))-C;
-        CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
+        C=10^(C/10); Celda(x,y,Sector(I))=I; FCelda = 0;
+        for h=1:12 
+            FCelda=FCelda+h*MASK(h,I);
+        end
+        Int = 0;
+        for h=1:20
+            if (Sector(I) == Sector(h) && h != I)
+                Int = Int + 10^(Pr(h)/10);
+            end
+        end
+        disp(Int);
+        if (Int != 0)
+            CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
+        else CI(x,y)=10*log10(C);
+        end
     end
 end
 
