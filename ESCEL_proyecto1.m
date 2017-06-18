@@ -70,8 +70,15 @@ for x=1:260
         [C,I]=max(Pr); % determinar la celda dominante en el punto x,y
         C=10^(C/10); Celda(x,y,Sector(I))=I;
         FCelda = 1*MASK(1,I)+4*MASK(4,I)+7*MASK(7,I)+10*MASK(10,I)+Sector(I)-1;
-        Int=sum(10.^(Pr/10).*MASK(FCelda,:))-C;
-        CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
+        % Se coloca en cero la potencia que no corresponden al mismo sector
+        NoInterfiere = 0;
+        for i=1:20
+            if((Sector(I) != Sector(i)) && (I != i) && ((mod(I,4)+1)==(mod(i,4)+1)))
+                NoInterfiere = NoInterfiere + 10^(Pr(i)/10);
+            end
+        end 
+        Int=sum(10.^(Pr/10).*MASK(FCelda,:))-C-NoInterfiere;
+        CI(x,y)=10*(log10(C)-log10(Int)); % calcular el C/I en dB del punto x,y
     end
 end
 
