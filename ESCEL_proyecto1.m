@@ -15,7 +15,7 @@
 
 clear; j=sqrt(-1); pi=3.141592654; format compact;
 
-Pref=-20; dref=10; n=5;
+Pref=-20; dref=10; n=3.3;
 % Pref, dref, n son los parametros del modelo exponencial para las perdidas
 % de trayecto (Pref va en dBm, dref va en metros)
 
@@ -37,10 +37,27 @@ load DATA_ESCELL_2; % Aqu� se carga el archivo previamente generado que contie
 % Los valores de SHAD son enteros y estan escalados por un factor de 80
 % Los valores de SHAD poseen correlacion espacial y angular
 
-MASK(1,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
-MASK(2,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
-MASK(3,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
-MASK(4,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+%Reuso N=4
+%MASK(1,:)=[0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0];
+%MASK(2,:)=[0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0];
+%MASK(3,:)=[0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1];
+%MASK(4,:)=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+
+%Reuso N=5
+%MASK(1,:)=[0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0];
+%MASK(2,:)=[0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0];
+%MASK(3,:)=[0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0];
+%MASK(4,:)=[1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0];
+%MASK(5,:)=[0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1];
+
+%Rsuso N=6
+MASK(1,:)=[0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0];
+MASK(2,:)=[0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1];
+MASK(3,:)=[0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0];
+MASK(4,:)=[1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0];
+MASK(5,:)=[0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0];
+MASK(6,:)=[0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0];
+
 % MASK es la mascara que asocia a cada BTS a uno de 4 grupos de frecuencias
 % MASK(g,b)=1 si la BTS b-esima pertenece al grupo de frecuencias g-esimo
 
@@ -55,7 +72,12 @@ for x=1:260
         end
         [C,I]=max(Pr); % determinar la celda dominante en el punto x,y
         C=10^(C/10); Celda(x,y)=I;
-        FCelda=1*MASK(1,I)+2*MASK(2,I)+3*MASK(3,I)+4*MASK(4,I); % determinar a que grupo de frec pertenece la celda dominante
+        %Para N=4
+        %FCelda=1*MASK(1,I)+2*MASK(2,I)+3*MASK(3,I)+4*MASK(4,I);
+        %Para N=5
+        %FCelda=1*MASK(1,I)+2*MASK(2,I)+3*MASK(3,I)+4*MASK(4,I)+5*MASK(5,I); % determinar a que grupo de frec pertenece la celda dominante
+        %PAra N=6
+        FCelda=1*MASK(1,I)+2*MASK(2,I)+3*MASK(3,I)+4*MASK(4,I)+5*MASK(5,I)+6*MASK(6,I);
         Int=sum(10.^(Pr/10).*MASK(FCelda,:))-C;
         CI(x,y)=10*log10(C/Int); % calcular el C/I en dB del punto x,y
     end
@@ -91,6 +113,10 @@ for x=1:260
         if MASK(2,Celda(x,y))==1; COLOR='r'; end
         if MASK(3,Celda(x,y))==1; COLOR='g'; end
         if MASK(4,Celda(x,y))==1; COLOR='y'; end
+        %Línea extra para N=5 (magenta)
+        if MASK(5,Celda(x,y))==1; COLOR='m'; end
+        %Línea extra para N=6 (cyan)
+        if MASK(6,Celda(x,y))==1; COLOR='c'; end
         punto=strcat(COLOR,'.');
         plot(x,y, punto)
     end
